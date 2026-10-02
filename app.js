@@ -42,6 +42,7 @@ const logoutBtn = $("logoutBtn");
 const monthLabel = $("monthLabel");
 const calendarGrid = $("calendarGrid");
 const weekdaysEl = $("weekdays");
+const calendarHint = $("calendarHint");
 const upcomingList = $("upcomingList");
 const allList = $("allList");
 
@@ -223,6 +224,7 @@ async function enterApp() {
   const canEdit = myProfile.role === "admin" || myProfile.role === "editor";
   addTripBtn.classList.toggle("hidden", !canEdit);
   usersBtn.classList.toggle("hidden", myProfile.role !== "admin");
+  calendarHint.classList.toggle("hidden", !canEdit);
 
   renderWeekdays();
   await loadTrips();
@@ -322,16 +324,24 @@ function tripsOnDay(dateObj) {
 
 function renderWeekdays() {
   weekdaysEl.innerHTML = "";
-  WEEKDAYS.forEach((w) => {
+  WEEKDAYS.forEach((w, i) => {
     const span = document.createElement("span");
     span.textContent = w;
+    if (i >= 5) span.classList.add("weekend"); // Сб, Вс
     weekdaysEl.appendChild(span);
   });
 }
 
+// Day-range selection (click a day, or drag across several, to start a new trip)
+let isSelecting = false;
+let selStart = null;
+let selEnd = null;
+let cellsMeta = []; // [{ date, el }] for the currently rendered month
+
 function renderCalendar() {
   monthLabel.textContent = `${MONTHS[viewDate.getMonth()]} ${viewDate.getFullYear()}`;
   calendarGrid.innerHTML = "";
+  cellsMeta = [];
 
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
@@ -357,9 +367,15 @@ function renderCalendar() {
     if (cells.length >= 42) break;
   }
 
-  cells.forEach(({ date, outside }) => {
+  cells.forEach(({ date, outside }, idx) => {
+    const weekday = idx % 7; // 0=Пн..6=Вс
+    const isWeekend = weekday >= 5;
     const cell = document.createElement("div");
-    cell.className = "day-cell" + (outside ? " outside" : "") + (isSameDay(date, today) ? " today" : "");
+    cell.className =
+      "day-cell" +
+      (outside ? " outside" : "") +
+      (isWeekend ? " weekend" : "") +
+      (isSameDay(date, today) ? " today" : "");
 
     const num = document.createElement("div");
     num.className = "day-num";
@@ -371,9 +387,22 @@ function renderCalendar() {
       const chip = document.createElement("div");
       chip.className = "trip-chip";
       chip.style.background = t.color || COLORS[0];
-      chip.textContent = t.name;
       chip.title = `${t.name}${t.place ? " — " + t.place : ""}`;
-      chip.addEventListener("click", () => openModal(t));
+      const placeLine = document.createElement("div");
+      placeLine.className = "chip-place";
+      placeLine.textContent = t.place || t.name;
+      chip.appendChild(placeLine);
+      if (t.place) {
+        const noteLine = document.createElement("div");
+        noteLine.className = "chip-note";
+        noteLine.textContent = t.name;
+        chip.appendChild(noteLine);
+      }
+      chip.addEventListener("mousedown", (e) => e.stopPropagation());
+      chip.addEventListener("click", (e) => {
+        e.stopPropagation();
+        openModal(t);
+      });
       cell.appendChild(chip);
     });
     if (dayTrips.length > 3) {
@@ -382,9 +411,56 @@ function renderCalendar() {
       more.textContent = `+${dayTrips.length - 3} ещё`;
       cell.appendChild(more);
     }
+
+    if (!canEditTrips()) cell.style.cursor = "default";
+
+    if (canEditTrips()) {
+      cell.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        isSelecting = true;
+        selStart = date;
+        selEnd = date;
+        paintSelection();
+      });
+      cell.addEventListener("mouseenter", () => {
+        if (!isSelecting) return;
+        selEnd = date;
+        paintSelection();
+      });
+    }
+
     calendarGrid.appendChild(cell);
+    cellsMeta.push({ date, el: cell });
+  });
+
+  paintSelection();
+}
+
+function paintSelection() {
+  if (!selStart || !selEnd) {
+    cellsMeta.forEach(({ el }) => el.classList.remove("selecting"));
+    return;
+  }
+  const lo = stripTime(selStart < selEnd ? selStart : selEnd);
+  const hi = stripTime(selStart < selEnd ? selEnd : selStart);
+  cellsMeta.forEach(({ date, el }) => {
+    const d = stripTime(date);
+    el.classList.toggle("selecting", isSelecting && d >= lo && d <= hi);
   });
 }
+
+document.addEventListener("mouseup", () => {
+  if (!isSelecting) return;
+  isSelecting = false;
+  const lo = selStart < selEnd ? selStart : selEnd;
+  const hi = selStart < selEnd ? selEnd : selStart;
+  selStart = null;
+  selEnd = null;
+  paintSelection();
+  if (canEditTrips()) {
+    openModal(null, { start: toISODate(lo), end: toISODate(hi) });
+  }
+});
 
 function renderLists() {
   const today = stripTime(new Date());
@@ -447,7 +523,7 @@ function canEditTrips() {
 
 let currentTripId = null;
 
-function openModal(trip) {
+function openModal(trip, range) {
   hideError(tripFormError);
   tripForm.reset();
   currentTripId = trip ? trip.id : null;
@@ -468,8 +544,8 @@ function openModal(trip) {
     modalTitle.textContent = "Новая поездка";
     tripIdInput.value = "";
     const todayISO = toISODate(new Date());
-    tripStartInput.value = todayISO;
-    tripEndInput.value = todayISO;
+    tripStartInput.value = range?.start || todayISO;
+    tripEndInput.value = range?.end || range?.start || todayISO;
     selectedColor = COLORS[trips.length % COLORS.length];
     deleteTripBtn.classList.add("hidden");
     historyBtn.classList.add("hidden");

@@ -11,6 +11,12 @@
   --radius: 12px;
   --shadow: 0 2px 10px rgba(20, 20, 43, 0.06);
   --today-ring: #4f6df5;
+  --cal-header-start: #4f6df5;
+  --cal-header-end: #3453e0;
+  --weekend-text: #e0567a;
+  --weekend-bg: #fdeef2;
+  --weekend-bg-hover: #fbe2e9;
+  --selection-bg: #eef2ff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -25,6 +31,12 @@
     --danger: #ff6b6f;
     --danger-bg: #3a1f22;
     --shadow: 0 2px 14px rgba(0, 0, 0, 0.4);
+    --cal-header-start: #3d4f99;
+    --cal-header-end: #2d3b78;
+    --weekend-text: #ff8fac;
+    --weekend-bg: #2c1f27;
+    --weekend-bg-hover: #38232c;
+    --selection-bg: #202a4a;
   }
 }
 
@@ -39,6 +51,12 @@
   --danger: #ff6b6f;
   --danger-bg: #3a1f22;
   --shadow: 0 2px 14px rgba(0, 0, 0, 0.4);
+  --cal-header-start: #3d4f99;
+  --cal-header-end: #2d3b78;
+  --weekend-text: #ff8fac;
+  --weekend-bg: #2c1f27;
+  --weekend-bg-hover: #38232c;
+  --selection-bg: #202a4a;
 }
 
 * { box-sizing: border-box; }
@@ -51,7 +69,7 @@ body {
 }
 
 .app {
-  max-width: 1200px;
+  max-width: 1320px;
   margin: 0 auto;
   padding: 0 16px 40px;
 }
@@ -136,41 +154,77 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  padding: 18px;
+  overflow: hidden;
 }
+.calendar-panel { padding: 0 0 16px; }
+.sidebar { padding: 18px; }
 
 .calendar-nav {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 14px;
+  padding: 16px 18px;
+  background: linear-gradient(135deg, var(--cal-header-start), var(--cal-header-end));
+  color: #fff;
 }
 
 .calendar-nav h2 {
   margin: 0;
-  font-size: 18px;
+  font-size: 19px;
+  font-weight: 700;
   flex: 1;
   text-transform: capitalize;
+}
+
+.calendar-nav .icon-btn {
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #fff;
+}
+.calendar-nav .icon-btn:hover { background: rgba(255, 255, 255, 0.28); }
+
+.calendar-nav .btn-ghost {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+.calendar-nav .btn-ghost:hover { background: rgba(255, 255, 255, 0.24); }
+
+.calendar-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 10px 18px 0;
+  margin: 0;
 }
 
 .weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  margin-bottom: 6px;
+  padding: 14px 10px 6px;
+  gap: 4px;
 }
 .weekdays span {
   text-align: center;
   font-size: 12px;
   color: var(--text-muted);
-  font-weight: 600;
-  padding: 6px 0;
+  font-weight: 700;
+  padding: 4px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-radius: 6px;
+}
+.weekdays span.weekend {
+  color: var(--weekend-text);
+  background: var(--weekend-bg);
 }
 
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  grid-auto-rows: minmax(86px, auto);
+  grid-auto-rows: minmax(92px, auto);
   gap: 4px;
+  padding: 0 10px;
+  user-select: none;
 }
 
 .day-cell {
@@ -180,35 +234,60 @@ body {
   display: flex;
   flex-direction: column;
   gap: 3px;
-  min-height: 86px;
+  min-height: 92px;
   background: var(--surface);
+  cursor: pointer;
+  transition: background .1s ease, box-shadow .1s ease;
 }
+.day-cell:hover { background: var(--bg); }
+
+.day-cell.weekend { background: var(--weekend-bg); }
+.day-cell.weekend:hover { background: var(--weekend-bg-hover); }
 
 .day-cell.outside {
-  opacity: 0.35;
+  opacity: 0.4;
 }
 
 .day-cell.today {
   box-shadow: inset 0 0 0 2px var(--today-ring);
 }
 
+.day-cell.selecting {
+  background: var(--selection-bg) !important;
+  box-shadow: inset 0 0 0 2px var(--primary);
+}
+
 .day-num {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
   color: var(--text-muted);
 }
+.day-cell.today .day-num { color: var(--primary); }
 
 .trip-chip {
   font-size: 11px;
-  padding: 2px 6px;
+  line-height: 1.3;
+  padding: 3px 6px;
   border-radius: 5px;
   color: #fff;
   cursor: pointer;
+  overflow: hidden;
+}
+.trip-chip:hover { filter: brightness(1.08); }
+.trip-chip .chip-place {
+  font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.trip-chip:hover { filter: brightness(1.08); }
+.trip-chip .chip-note {
+  font-weight: 400;
+  opacity: 0.9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 10px;
+}
 
 .sidebar h3 {
   font-size: 14px;
