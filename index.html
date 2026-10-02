@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Календарь поездок</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧳</text></svg>" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-icon">🧳</span>
+        <h1>Календарь поездок</h1>
+      </div>
+      <button id="addTripBtn" class="btn btn-primary">+ Добавить поездку</button>
+    </header>
+
+    <main class="layout">
+      <section class="calendar-panel">
+        <div class="calendar-nav">
+          <button id="prevMonth" class="icon-btn" aria-label="Предыдущий месяц">‹</button>
+          <h2 id="monthLabel"></h2>
+          <button id="nextMonth" class="icon-btn" aria-label="Следующий месяц">›</button>
+          <button id="todayBtn" class="btn btn-ghost">Сегодня</button>
+        </div>
+        <div class="weekdays" id="weekdays"></div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+      </section>
+
+      <aside class="sidebar">
+        <h3>Ближайшие поездки</h3>
+        <div id="upcomingList" class="trip-list"></div>
+
+        <h3>Все поездки</h3>
+        <div id="allList" class="trip-list"></div>
+      </aside>
+    </main>
+  </div>
+
+  <div id="tripModal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">Новая поездка</h3>
+        <button id="closeModal" class="icon-btn" aria-label="Закрыть">✕</button>
+      </div>
+      <form id="tripForm">
+        <input type="hidden" id="tripId" />
+        <label>
+          Название
+          <input type="text" id="tripName" required placeholder="Например: Поездка в Лиссабон" />
+        </label>
+        <label>
+          Место
+          <input type="text" id="tripPlace" placeholder="Город / страна" />
+        </label>
+        <div class="row">
+          <label>
+            Начало
+            <input type="date" id="tripStart" required />
+          </label>
+          <label>
+            Окончание
+            <input type="date" id="tripEnd" required />
+          </label>
+        </div>
+        <label>
+          Цвет
+          <div class="color-picker" id="colorPicker"></div>
+        </label>
+        <label>
+          Заметки
+          <textarea id="tripNotes" rows="3" placeholder="Детали, бронирования, рейсы..."></textarea>
+        </label>
+        <div class="modal-actions">
+          <button type="button" id="deleteTripBtn" class="btn btn-danger hidden">Удалить</button>
+          <div class="spacer"></div>
+          <button type="button" id="cancelBtn" class="btn btn-ghost">Отмена</button>
+          <button type="submit" class="btn btn-primary">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
