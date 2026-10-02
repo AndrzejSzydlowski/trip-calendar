@@ -337,3 +337,183 @@ body {
 }
 .spacer { flex: 1; }
 .hidden { display: none !important; }
+
+/* ---------- Auth screen ---------- */
+.auth-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 380px;
+}
+.auth-card .brand {
+  justify-content: center;
+  margin-bottom: 18px;
+}
+.auth-form label {
+  display: block;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.auth-form input {
+  display: block;
+  width: 100%;
+  margin-top: 5px;
+  padding: 10px 11px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+}
+.btn-block { width: 100%; margin-top: 4px; }
+.auth-form .btn-block + .btn-block { margin-top: 8px; }
+.hint {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0 0 14px;
+  line-height: 1.5;
+}
+.auth-footnote {
+  margin-top: 18px;
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.5;
+}
+.form-error {
+  background: var(--danger-bg);
+  color: var(--danger);
+  font-size: 13px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  margin: -4px 0 12px;
+}
+.form-success {
+  background: #e9f9ee;
+  color: #17b26a;
+  font-size: 13px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  margin: 8px 0;
+}
+
+/* ---------- Topbar extras ---------- */
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.whoami {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ---------- History modal ---------- */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.history-row {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: var(--bg);
+}
+.history-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.history-action {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 2px 7px;
+  border-radius: 5px;
+}
+.history-insert { background: #e9f9ee; color: #17b26a; }
+.history-update { background: #fff4e5; color: #f79009; }
+.history-delete { background: var(--danger-bg); color: var(--danger); }
+.history-when { font-size: 12px; color: var(--text-muted); }
+.history-who { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+.history-diff {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  font-size: 12px;
+}
+.history-diff li { margin-bottom: 2px; }
+
+/* ---------- Users / admin panel ---------- */
+.modal-wide { max-width: 560px; }
+.mfa-gate { text-align: center; padding: 10px 0; }
+.mfa-gate .auth-form { max-width: 260px; margin: 14px auto 0; text-align: left; }
+.invite-form {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.invite-form input[type="email"] {
+  flex: 1;
+  min-width: 180px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+}
+.invite-form select {
+  padding: 9px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+}
+.users-table {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.user-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+}
+.user-email { font-size: 13px; font-weight: 600; }
+.user-role { font-size: 12px; color: var(--text-muted); }
+.user-actions { display: flex; gap: 6px; align-items: center; }
+.user-actions select {
+  padding: 5px 6px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+}
+.btn-sm { padding: 5px 10px; font-size: 12px; }
