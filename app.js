@@ -383,45 +383,72 @@ function renderCalendar() {
     cell.appendChild(num);
 
     const dayTrips = tripsOnDay(date);
-    dayTrips.slice(0, 3).forEach((t) => {
-      const chip = document.createElement("div");
-      chip.className = "trip-chip";
-      chip.style.background = t.color || COLORS[0];
-      chip.title = `${t.name}${t.place ? " — " + t.place : ""}`;
+
+    if (dayTrips.length === 1) {
+      // The whole day belongs to one trip — fill the entire square with its color.
+      const t = dayTrips[0];
+      cell.classList.add("filled");
+      cell.style.background = t.color || COLORS[0];
+      cell.title = `${t.name}${t.place ? " — " + t.place : ""}`;
+      const label = document.createElement("div");
+      label.className = "day-fill-label";
       const placeLine = document.createElement("div");
       placeLine.className = "chip-place";
       placeLine.textContent = t.place || t.name;
-      chip.appendChild(placeLine);
+      label.appendChild(placeLine);
       if (t.place) {
         const noteLine = document.createElement("div");
         noteLine.className = "chip-note";
         noteLine.textContent = t.name;
-        chip.appendChild(noteLine);
+        label.appendChild(noteLine);
       }
-      chip.addEventListener("mousedown", (e) => e.stopPropagation());
-      chip.addEventListener("click", (e) => {
+      cell.appendChild(label);
+      cell.addEventListener("mousedown", (e) => e.stopPropagation());
+      cell.addEventListener("click", (e) => {
         e.stopPropagation();
         openModal(t);
       });
-      cell.appendChild(chip);
-    });
-    if (dayTrips.length > 3) {
-      const more = document.createElement("div");
-      more.className = "day-num";
-      more.textContent = `+${dayTrips.length - 3} ещё`;
-      cell.appendChild(more);
+    } else if (dayTrips.length > 1) {
+      // Several trips overlap this day — split the square into colored bands.
+      cell.classList.add("filled", "multi");
+      const bands = document.createElement("div");
+      bands.className = "day-bands";
+      dayTrips.slice(0, 4).forEach((t) => {
+        const band = document.createElement("div");
+        band.className = "day-band";
+        band.style.background = t.color || COLORS[0];
+        band.title = `${t.name}${t.place ? " — " + t.place : ""}`;
+        band.textContent = t.place || t.name;
+        band.addEventListener("mousedown", (e) => e.stopPropagation());
+        band.addEventListener("click", (e) => {
+          e.stopPropagation();
+          openModal(t);
+        });
+        bands.appendChild(band);
+      });
+      cell.appendChild(bands);
+      if (dayTrips.length > 4) {
+        const more = document.createElement("div");
+        more.className = "day-more";
+        more.textContent = `+${dayTrips.length - 4} ещё`;
+        cell.appendChild(more);
+      }
     }
 
     if (!canEditTrips()) cell.style.cursor = "default";
 
     if (canEditTrips()) {
-      cell.addEventListener("mousedown", (e) => {
-        e.preventDefault();
-        isSelecting = true;
-        selStart = date;
-        selEnd = date;
-        paintSelection();
-      });
+      // Only an empty day starts a brand-new selection; dragging can still
+      // continue across occupied days to extend the range.
+      if (dayTrips.length === 0) {
+        cell.addEventListener("mousedown", (e) => {
+          e.preventDefault();
+          isSelecting = true;
+          selStart = date;
+          selEnd = date;
+          paintSelection();
+        });
+      }
       cell.addEventListener("mouseenter", () => {
         if (!isSelecting) return;
         selEnd = date;

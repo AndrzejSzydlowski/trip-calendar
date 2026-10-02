@@ -274,19 +274,90 @@ body {
   overflow: hidden;
 }
 .trip-chip:hover { filter: brightness(1.08); }
-.trip-chip .chip-place {
+.chip-place {
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.trip-chip .chip-note {
+.chip-note {
   font-weight: 400;
   opacity: 0.9;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 10px;
+}
+
+/* A day fully taken by one trip — the whole square is that trip's color. */
+.day-cell.filled {
+  border-color: transparent;
+  color: #fff;
+  cursor: pointer;
+  justify-content: flex-start;
+}
+.day-cell.filled:hover { filter: brightness(1.06); }
+.day-cell.filled .day-num { color: rgba(255, 255, 255, 0.85); }
+.day-cell.filled.today { box-shadow: inset 0 0 0 2px #fff; }
+
+.day-fill-label {
+  margin-top: 2px;
+  color: #fff;
+  overflow: hidden;
+}
+.day-fill-label .chip-place {
+  font-size: 12px;
+  white-space: normal;
+}
+.day-fill-label .chip-note {
+  font-size: 10px;
+  white-space: normal;
+}
+
+/* Several trips overlap the same day — split the square into bands. */
+.day-cell.multi {
+  padding: 0;
+  gap: 0;
+}
+.day-cell.multi .day-num {
+  position: absolute;
+  margin: 6px 0 0 6px;
+  color: var(--text-muted);
+  text-shadow: 0 0 3px rgba(255, 255, 255, 0.6);
+  z-index: 1;
+}
+.day-cell.multi { position: relative; }
+.day-bands {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+}
+.day-band {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 2px 6px;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+.day-band:first-child { padding-left: 24px; }
+.day-band:hover { filter: brightness(1.08); }
+.day-more {
+  position: absolute;
+  bottom: 2px;
+  right: 6px;
+  font-size: 10px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 1px 5px;
+  border-radius: 4px;
+  z-index: 1;
 }
 
 .sidebar h3 {
